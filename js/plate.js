@@ -40,6 +40,17 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 		}
 	}
 
+	// Determine if the object given by
+	// the arguments is colliding with
+	// this plate.
+	this.isBeingCollided = function() {
+
+
+
+
+		return;
+	}
+
 	// Function to save the current position
 	// coordinates into the "prev" variables.
 	this.saveCurrentPos = function() {

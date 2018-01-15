@@ -1,34 +1,15 @@
 // Global Variables:
-var leftPin_x;
-var leftPin_y;
-var leftPin_diam;
-var rightPin_x;
-var rightPin_y;
-var rightPin_diam;
-
 var startDrag_x;
 var startDrag_y;
 var objList;
 var dragging;
 var dragObj;
 
+// Setup function.
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	rectMode(CORNER);
 	ellipseMode(CENTER);
-
-	leftHole_x = 100;
-	leftHole_y = 100;
-	leftHole_diam = 50;
-	rightHole_x = 300;
-	rightHole_y = 100;
-	rightHole_diam = 50;
-	leftPin_x = 100;
-	leftPin_y = 100;
-	leftPin_diam = 20;
-	rightPin_x = 300;
-	rightPin_y = 100;
-	rightPin_diam = 20;
 
 	startDrag_x = 0;
 	startDrag_y = 0;
@@ -44,25 +25,16 @@ function setup() {
 	newObj.addHole(400, 200, 50, 0, 255);
 	objList.push(newObj);
 
-	// Create 2 pins to sit inside the holes.
+	// Create 2 pins to sit inside the plate holes.
 	var newObj = new Pin(200, 200, 20, 0, 80);
 	objList.push(newObj);
 	var newObj = new Pin(400, 200, 20, 0, 80);
 	objList.push(newObj);
-
-	// Create left pin.
-//	newObj = new pin();
-
 }
 
+// Draw loop.
 function draw() {
 	background(255);
-
-	// Draw two pins that lie inside the
-	// holes in the plate.
-	// fill(80);
-	// ellipse(leftPin_x, leftPin_y, leftPin_diam, leftPin_diam);
-	// ellipse(rightPin_x, rightPin_y, rightPin_diam, rightPin_diam);
 
 	// Update positions of all objects
 	// and draw them to the canvas.
@@ -74,16 +46,33 @@ function draw() {
 	}
 }
 
+// Interrupt function that runs once
+// when the mouse button is pressed.
 function mousePressed() {
 	startDrag_x = mouseX;
 	startDrag_y = mouseY;
 
 	if(mouseIsPressed) {
-		for(var i = 0; i < objList.length; i++) {
+		// Intentionally loop through this
+		// array backwards so objects at the
+		// end of the list get "clicked" first.
+		// This ensures that the objects at the
+		// "top" of the stack are selected
+		// when the mouse button is clicked.
+		for(var i = (objList.length - 1); i >= 0; i--) {
 			if(objList[i].isPointedByMouse(startDrag_x, startDrag_y)) {
-				dragging = true;
-				dragObj = i;
 				objList[i].saveCurrentPos();
+				// Move dragged object to the
+				// end of the list so it
+				// gets selected first in the future,
+				// and so that it gets rendered last,
+				// therefore appearing on "top" of
+				// all of the other objects.
+				var temp = objList[i];
+				objList.splice(i, 1);
+				objList.push(temp);
+				dragging = true;
+				dragObj = (objList.length - 1);
 				return;
 			}
 		}
@@ -91,6 +80,8 @@ function mousePressed() {
 	return;
 }
 
+// Interrupt function that runs once
+// when the mouse button is released.
 function mouseReleased() {
 	dragging = false;
 	dragObj = -99;
