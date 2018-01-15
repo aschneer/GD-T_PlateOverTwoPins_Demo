@@ -8,6 +8,7 @@ function Hole(x, y, diam, strokeColor, fillColor) {
 	this.diam = diam;
 	this.strokeColor = strokeColor;
 	this.fillColor = fillColor;
+	this.draggable = false;
 
 	// Methods:
 

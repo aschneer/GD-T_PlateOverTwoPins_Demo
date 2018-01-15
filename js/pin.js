@@ -9,6 +9,7 @@ function Pin(x, y, diam, strokeColor, fillColor) {
 	this.strokeColor = strokeColor;
 	this.fillColor = fillColor;
 	this.isPressed = false;
+	this.draggable = true;
 
 	// Methods:
 

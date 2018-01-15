@@ -12,13 +12,14 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	this.fillColor = fillColor;
 	this.holes = [];
 	this.isPressed = false;
+	this.draggable = true;
 
 	// Methods:
 
 	this.addHole = function(x, y, diam, strokeColor, fillColor) {
 		var newHole = new Hole(x, y, diam, strokeColor, fillColor);
 		this.holes.push(newHole);
-		return;
+		return newHole;
 	}
 
 	// Determine if the mouse pointer
@@ -41,10 +42,10 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	}
 
 	// Determine if the object given by
-	// the arguments is colliding with
+	// the argument is colliding with
 	// this plate.
-	this.isBeingCollided = function() {
-
+	this.isBeingCollided = function(obj) {
+		
 
 
 
@@ -67,11 +68,6 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	// coordinates during motion, of the
 	// plate and any holes within it.
 	this.updatePos = function(startDrag_x, startDrag_y) {
-
-
-//		console.log(this.prevX, this.prevY, this.x, this.y);
-		
-
 		this.x = this.prevX + (mouseX - startDrag_x);
 		this.y = this.prevY + (mouseY - startDrag_y);
 		for(var i = 0; i < this.holes.length; i++) {
@@ -87,9 +83,6 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 		stroke(this.strokeColor);
 		fill(this.fillColor);
 		rect(this.x, this.y, this.width, this.height);
-		for(var i = 0; i < this.holes.length; i++) {
-			this.holes[i].display();
-		}
 		return;
 	}
 }

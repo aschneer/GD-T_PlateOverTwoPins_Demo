@@ -21,9 +21,14 @@ function setup() {
 
 	// Create plate with holes in it.
 	var newObj = new Plate(100, 100, 400, 200, 0, 80);
-	newObj.addHole(200, 200, 50, 0, 255);
-	newObj.addHole(400, 200, 50, 0, 255);
 	objList.push(newObj);
+	// Simultaneously add holes to the plate,
+	// and push the hole objects that are
+	// returned onto the end of the objList array.
+	// All objects and sub-objects are rendered
+	// on the root level.
+	objList.push(newObj.addHole(200, 200, 50, 0, 255));
+	objList.push(newObj.addHole(400, 200, 50, 0, 255));
 
 	// Create 2 pins to sit inside the plate holes.
 	var newObj = new Pin(200, 200, 20, 0, 80);
@@ -60,20 +65,13 @@ function mousePressed() {
 		// "top" of the stack are selected
 		// when the mouse button is clicked.
 		for(var i = (objList.length - 1); i >= 0; i--) {
-			if(objList[i].isPointedByMouse(startDrag_x, startDrag_y)) {
-				objList[i].saveCurrentPos();
-				// Move dragged object to the
-				// end of the list so it
-				// gets selected first in the future,
-				// and so that it gets rendered last,
-				// therefore appearing on "top" of
-				// all of the other objects.
-				var temp = objList[i];
-				objList.splice(i, 1);
-				objList.push(temp);
-				dragging = true;
-				dragObj = (objList.length - 1);
-				return;
+			if(objList[i].draggable) {
+				if(objList[i].isPointedByMouse(startDrag_x, startDrag_y)) {
+					objList[i].saveCurrentPos();
+					dragging = true;
+					dragObj = i;
+					return;
+				}
 			}
 		}
 	}
