@@ -44,6 +44,12 @@ function setup() {
 	newObj.addHole(400, 200, 50, 0, 255);
 	objList.push(newObj);
 
+	// Create 2 pins to sit inside the holes.
+	var newObj = new Pin(200, 200, 20, 0, 80);
+	objList.push(newObj);
+	var newObj = new Pin(400, 200, 20, 0, 80);
+	objList.push(newObj);
+
 	// Create left pin.
 //	newObj = new pin();
 
