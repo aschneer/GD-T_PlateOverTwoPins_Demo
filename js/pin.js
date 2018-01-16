@@ -1,6 +1,7 @@
 // Pin class.
 function Pin(x, y, diam, strokeColor, fillColor) {
 	// Attributes:
+	this.type = "CIRCLE";
 	this.prevX = x;
 	this.prevY = y;
 	this.x = x;

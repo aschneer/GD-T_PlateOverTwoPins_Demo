@@ -2,6 +2,7 @@
 function Plate(x, y, width, height, strokeColor, fillColor) {
 
 	// Attributes:
+	this.type = "RECT";
 	this.prevX = x;
 	this.prevY = y;
 	this.x = x;
@@ -43,13 +44,72 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 
 	// Determine if the object given by
 	// the argument is colliding with
-	// this plate.
-	this.isBeingCollided = function(obj) {
-		
+	// this plate. The argument must be
+	// a shape object that contains the
+	// information necessary to determine
+	// if it is colliding, such as its
+	// x and y position, width and height
+	// or diameter, etc.
+	//
+	// Valid objType's include POINT,
+	// CIRCLE, LINE, RECT, TRIANGLE,
+	// ARC, and POLY. These are defined
+	// by the definitions in the collide2d
+	// library.
+	this.isBeingCollidedBy = function(obj) {
+		switch(obj.type) {
+			case "POINT":
+				var inRect = collidePointRect(obj.x, obj.y, this.x, this.y, this.width, this.height);
+				var inHole = false;
+				for(var i = 0; i < this.holes.length; i++) {
+					inHole = inHole || collidePointCircle(obj.x, obj.y, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
+				}
+				break;
 
 
 
-		return;
+			// FOR THE REST OF THESE CASES, I NEED TO FIGURE OUT
+			// HOW TO DISTINGUISH A SHAPE BEING IN A HOLE FROM BEING
+			// INSIDE THE PLATE. RIGHT NOW, SINCE THE HOLE IS CONSIDERED
+			// PLATE AREA BY THE COLLOSION DETECTION LIBRARY, THERE IS NO
+			// WAY TO DISTINGUISH USING THE LIBRARY'S FUNCTIONS. IN OTHER
+			// WORDS, A SHAPE THAT IS PARTIALLY INSIDE AND OUTSIDE THE
+			// HOLE IS CONSIDERED INSIDE BOTH, WHICH IS TRUE, BUT THERE
+			// IS NO DISTINCTION BETWEEN INSIDE BOTH AND ONLY INSIDE
+			// THE HOLE, BECAUSE THE LIBRARY CONSIDERS "ONLY INSIDE
+			// THE HOLE" TO ALSO BE INSIDE THE PLATE.
+
+			case "CIRCLE":
+				var inRect = collideRectCircle(this.x, this.y, this.width, this.height, obj.x, obj.y, obj.diam);
+				var inHole = false;
+				for(var i = 0; i < this.holes.length; i++) {
+					inHole = inHole || collideCircleCircle(obj.x, obj.y, obj.diam, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
+				}
+				break;
+			case "LINE":
+				break;
+			case "RECT":
+				break;
+			case "TRIANGLE":
+				break;
+			case "ARC":
+				break;
+			case "POLY":
+				break;
+			default:
+				break;
+		}
+		if(obj.type == "POINT") {
+			if(inRect && (!inHole)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+
+		}
 	}
 
 	// Function to save the current position

@@ -56,6 +56,7 @@ function draw() {
 function mousePressed() {
 	startDrag_x = mouseX;
 	startDrag_y = mouseY;
+	var startDragPoint = new Point(startDrag_x, startDrag_y);
 
 	if(mouseIsPressed) {
 		// Intentionally loop through this
