@@ -2,6 +2,7 @@
 function Hole(x, y, diam, strokeColor, fillColor) {
 	// Attributes:
 	this.type = "CIRCLE";
+	this.className = "Hole";
 	this.prevX = x;
 	this.prevY = y;
 	this.x = x;

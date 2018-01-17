@@ -44,9 +44,37 @@ function draw() {
 	// Update positions of all objects
 	// and draw them to the canvas.
 	for(var i = 0; i < objList.length; i++) {
+		// Update position of the object
+		// being dragged, if any.
 		if(dragging) {
-			objList[dragObj].updatePos(startDrag_x, startDrag_y);
+			// // Determine if the dragged
+			// // object is colliding with
+			// // any other objects in the
+			// // list.
+			// var colliding = false;
+			// for(var j = 0; j < objList.length; j++) {
+			// 	// Don't test if the dragged object
+			// 	// is colliding with itself. Also, skip
+			// 	// holes because they can't be collided with.
+			// 	if((j != dragObj) && (objList[j].className != "Hole")) {
+			// 		colliding |= objList[j].isBeingCollidedBy(objList[dragObj]);
+			// 	}
+			// }
+			// // If it is colliding with something,
+			// // set its position to its previous position,
+			// // at which it presumably was not colliding.
+			// if(colliding) {
+			// 	// objList[dragObj].x = objList[dragObj].prevX;
+			// 	// objList[dragObj].y = objList[dragObj].prevY;
+			// }
+			// // If it is not colliding with anything,
+			// // updated its position based on the
+			// // mouse drag.
+			// else {
+				objList[dragObj].updatePos(startDrag_x, startDrag_y, objList, dragObj);
+			// }
 		}
+		// Display the object.
 		objList[i].display();
 	}
 }

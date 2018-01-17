@@ -2,6 +2,7 @@
 function Point(x, y) {
 	// Attributes:
 	this.type = "POINT";
+	this.className = "Point";
 	this.prevX = x;
 	this.prevY = y;
 	this.x = x;
@@ -23,5 +24,13 @@ function Point(x, y) {
 	this.updatePos = function(startDrag_x, startDrag_y) {
 		this.x = this.prevX + (mouseX - startDrag_x);
 		this.y = this.prevY + (mouseY - startDrag_y);
+	}
+
+	// Function to determine if this point
+	// object shares the same position
+	// coordinates as the one given by
+	// the argument.
+	this.equals = function(pointObj) {
+		return ((pointObj.x == this.x) && (pointObj.y == this.y));
 	}
 }

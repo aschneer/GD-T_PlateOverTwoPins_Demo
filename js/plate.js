@@ -3,6 +3,7 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 
 	// Attributes:
 	this.type = "RECT";
+	this.className = "Plate";
 	this.prevX = x;
 	this.prevY = y;
 	this.x = x;
@@ -32,7 +33,7 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 		var inRect = collidePointRect(mouse_x, mouse_y, this.x, this.y, this.width, this.height);
 		var inHole = false;
 		for(var i = 0; i < this.holes.length; i++) {
-			inHole = inHole || collidePointCircle(mouse_x, mouse_y, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
+			inHole |= collidePointCircle(mouse_x, mouse_y, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
 		}
 		if(inRect && (!inHole)) {
 			return true;
@@ -57,68 +58,62 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	// by the definitions in the collide2d
 	// library.
 	this.isBeingCollidedBy = function(obj) {
+		var collision = false;
 		switch(obj.type) {
 			case "POINT":
 				var inRect = collidePointRect(obj.x, obj.y, this.x, this.y, this.width, this.height);
 				var inHole = false;
 				for(var i = 0; i < this.holes.length; i++) {
-					inHole = inHole || collidePointCircle(obj.x, obj.y, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
+					inHole |= collidePointCircle(obj.x, obj.y, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
 				}
+				collision = (inRect && (!inHole));
 				break;
-
-
-
-			// FOR THE REST OF THESE CASES, I NEED TO FIGURE OUT
-			// HOW TO DISTINGUISH A SHAPE BEING IN A HOLE FROM BEING
-			// INSIDE THE PLATE. RIGHT NOW, SINCE THE HOLE IS CONSIDERED
-			// PLATE AREA BY THE COLLOSION DETECTION LIBRARY, THERE IS NO
-			// WAY TO DISTINGUISH USING THE LIBRARY'S FUNCTIONS. IN OTHER
-			// WORDS, A SHAPE THAT IS PARTIALLY INSIDE AND OUTSIDE THE
-			// HOLE IS CONSIDERED INSIDE BOTH, WHICH IS TRUE, BUT THERE
-			// IS NO DISTINCTION BETWEEN INSIDE BOTH AND ONLY INSIDE
-			// THE HOLE, BECAUSE THE LIBRARY CONSIDERS "ONLY INSIDE
-			// THE HOLE" TO ALSO BE INSIDE THE PLATE.
-
 			case "CIRCLE":
 				var inRect = collideRectCircle(this.x, this.y, this.width, this.height, obj.x, obj.y, obj.diam);
-				var inHole = false;
+				var completelyInHole = false;
+				// Special formula is used to determine if one circle
+				// is fully contained within the other. This is true
+				// when the center point of the pin is colliding
+				// with a circle centered in the hole with diameter
+				// equal to the difference between the hole and pin
+				// diameters, or if the circles are equal diameter and
+				// share a center point.
 				for(var i = 0; i < this.holes.length; i++) {
-					inHole = inHole || collideCircleCircle(obj.x, obj.y, obj.diam, this.holes[i].x, this.holes[i].y, this.holes[i].diam);
+					if(this.holes[i].diam > obj.diam) {
+						completelyInHole |= collidePointCircle(obj.x, obj.y, this.holes[i].x, this.holes[i].y, (this.holes[i].diam - obj.diam));
+					}
+					else if(this.holes[i].diam == obj.diam) {
+						completelyInHole |= ((obj.x == this.holes[i].x) && (obj.y == this.holes[i].y));
+					}
+					// Hole diam < obj diam.
+					else {
+						completelyInHole = false;
+					}
 				}
+				collision = (inRect && (!completelyInHole));
 				break;
-			case "LINE":
-				break;
-			case "RECT":
-				break;
-			case "TRIANGLE":
-				break;
-			case "ARC":
-				break;
-			case "POLY":
-				break;
+			// case "LINE":
+			// 	break;
+			// case "RECT":
+			// 	break;
+			// case "TRIANGLE":
+			// 	break;
+			// case "ARC":
+			// 	break;
+			// case "POLY":
+			// 	break;
 			default:
+				collision = false;
 				break;
 		}
-		if(obj.type == "POINT") {
-			if(inRect && (!inHole)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-
-		}
+		return collision;
 	}
 
 	// Function to save the current position
 	// coordinates into the "prev" variables.
 	this.saveCurrentPos = function() {
-		for(var i = 0; i < 1000; i++) {
-			this.prevX = this.x;
-			this.prevY = this.y;
-		}
+		this.prevX = this.x;
+		this.prevY = this.y;
 		for(var i = 0; i < this.holes.length; i++) {
 			this.holes[i].saveCurrentPos();
 		}
@@ -127,12 +122,27 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	// Function to udpate position
 	// coordinates during motion, of the
 	// plate and any holes within it.
-	this.updatePos = function(startDrag_x, startDrag_y) {
-		this.x = this.prevX + (mouseX - startDrag_x);
-		this.y = this.prevY + (mouseY - startDrag_y);
-		for(var i = 0; i < this.holes.length; i++) {
-			this.holes[i].updatePos(startDrag_x, startDrag_y);
-		}
+	this.updatePos = function(startDrag_x, startDrag_y, objList, dragObj) {
+		// // Determine if this
+		// // object is colliding with
+		// // any other objects in the
+		// // list.
+		// var colliding = false;
+		// for(var i = 0; i < objList.length; i++) {
+		// 	// Don't test if this object
+		// 	// is colliding with itself. Also, skip
+		// 	// holes because they can't be collided with.
+		// 	if((i != dragObj) && (objList[i].className != "Hole")) {
+		// 		colliding |= objList[i].isBeingCollidedBy(objList[dragObj]);
+		// 	}
+		// }
+		// if(!colliding) {
+			this.x = this.prevX + (mouseX - startDrag_x);
+			this.y = this.prevY + (mouseY - startDrag_y);
+			for(var i = 0; i < this.holes.length; i++) {
+				this.holes[i].updatePos(startDrag_x, startDrag_y);
+			}
+		// }
 	}
 
 	// Render the plate and any holes in it
