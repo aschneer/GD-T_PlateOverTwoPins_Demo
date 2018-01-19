@@ -123,26 +123,54 @@ function Plate(x, y, width, height, strokeColor, fillColor) {
 	// coordinates during motion, of the
 	// plate and any holes within it.
 	this.updatePos = function(startDrag_x, startDrag_y, objList, dragObj) {
-		// // Determine if this
-		// // object is colliding with
-		// // any other objects in the
-		// // list.
-		// var colliding = false;
-		// for(var i = 0; i < objList.length; i++) {
-		// 	// Don't test if this object
-		// 	// is colliding with itself. Also, skip
-		// 	// holes because they can't be collided with.
-		// 	if((i != dragObj) && (objList[i].className != "Hole")) {
-		// 		colliding |= objList[i].isBeingCollidedBy(objList[dragObj]);
-		// 	}
-		// }
-		// if(!colliding) {
-			this.x = this.prevX + (mouseX - startDrag_x);
-			this.y = this.prevY + (mouseY - startDrag_y);
+		// Determine if this
+		// object is colliding with
+		// any other objects in the
+		// list.
+		var colliding = false;
+		// Create a copy of this object
+		// (which is the object being dragged);
+		var newObjPos = new Plate(this.x, this.y, this.width, this.height, this.strokeColor, this.fillColor);
+		newObjPos.type = this.type;
+		newObjPos.className = this.className;
+		newObjPos.prevX = this.prevX;
+		newObjPos.prevY = this.prevY;
+		newObjPos.holes = this.holes;
+		newObjPos.isPressed = this.isPressed;
+		newObjPos.draggable = this.draggable;
+		// Set the copy object to have the next
+		// proposed position.
+		newObjPos.x = newObjPos.prevX + (mouseX - startDrag_x);
+		newObjPos.y = newObjPos.prevY + (mouseY - startDrag_y);
+
+		// Check if any other objects in the list
+		// will collide with this one (being dragged)
+		// if it takes on the next proposed position.
+		for(var i = 0; i < objList.length; i++) {
+			// Don't test if this object
+			// is colliding with itself. Also, skip
+			// holes because they can't be collided with.
+			if((i != dragObj) && (objList[i].className != "Hole")) {
+				colliding |= objList[i].isBeingCollidedBy(newObjPos);
+			}
+		}
+		if(colliding) {
+			console.log("colliding - plate.");
+		}
+		// If no collision, save the new proposed
+		// position to this object.
+		if(!colliding) {
+			console.log("not colliding - plate.");
+
+
+			this.x = newObjPos.x;
+			this.y = newObjPos.y;
+			// this.x = this.prevX + (mouseX - startDrag_x);
+			// this.y = this.prevY + (mouseY - startDrag_y);
 			for(var i = 0; i < this.holes.length; i++) {
 				this.holes[i].updatePos(startDrag_x, startDrag_y);
 			}
-		// }
+		}
 	}
 
 	// Render the plate and any holes in it
